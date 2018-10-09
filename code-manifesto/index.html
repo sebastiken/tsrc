@@ -476,7 +476,7 @@ class Foo:
 <pre><code class="python"># Yes
 work_path = Path(&quot;foo/work&quot;)
 work_path.mkdir_p()
-foo_path = work_path.joinpath(&quot;foo.txt&quot;)
+foo_path = work_path / &quot;foo.txt&quot;
 foo_path.write_text(&quot;this is bar&quot;)
 
 # No

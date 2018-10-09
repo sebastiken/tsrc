@@ -104,6 +104,17 @@
     <a class="current" href="./">Changelog</a>
     <ul class="subnav">
             
+    <li class="toctree-l2"><a href="#v060">v0.6.0</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#add_support_for_multiple_remotes">Add support for multiple remotes:</a></li>
+        
+            <li><a class="toctree-l3" href="#tsrc_foreach">tsrc foreach</a></li>
+        
+        </ul>
+    
+
     <li class="toctree-l2"><a href="#v050_2018-08-14">v0.5.0 (2018-08-14)</a></li>
     
 
@@ -194,7 +205,35 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="v050_2018-08-14">v0.5.0 (2018-08-14)<a class="headerlink" href="#v050_2018-08-14" title="Permanent link">&para;</a></h1>
+                <h1 id="v060">v0.6.0<a class="headerlink" href="#v060" title="Permanent link">&para;</a></h1>
+<h2 id="add_support_for_multiple_remotes">Add support for multiple remotes:<a class="headerlink" href="#add_support_for_multiple_remotes" title="Permanent link">&para;</a></h2>
+<pre><code class="yaml"># still valid (implicit 'origin' remote)
+src: foo
+url: git@github.com/foo
+
+# also valid (two explicit remotes)
+src: fooo
+remotes:
+  - { name: origin, url: git@github.com:john/foo }
+  - { name: upstream, url: git@github.com:foo/foo}
+
+# not valid (ambiguous)
+src: foo
+url: git@github.com:john/foo
+remotes:
+   - { name: upstream, url: git@github.com:foo/foo }
+</code></pre>
+
+<p>Thanks @tst2005 and @cgestes for their help with the configuration format.</p>
+<ul>
+<li>Fix <a href="https://github.com/SuperTanker/tsrc/issues/113">#113</a>: do not hide branch when showing tag status.</li>
+<li>Add support for Python 3.7</li>
+</ul>
+<h2 id="tsrc_foreach">tsrc foreach<a class="headerlink" href="#tsrc_foreach" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>tsrc foreach</code>: add a <code>--group</code> option to select the repositories to run the command on. Fix #40</li>
+</ul>
+<h1 id="v050_2018-08-14">v0.5.0 (2018-08-14)<a class="headerlink" href="#v050_2018-08-14" title="Permanent link">&para;</a></h1>
 <ul>
 <li>Add support for setting approvers with the <code>-r,--approvers</code> option in <code>tsrc push</code> (GitLab Enterprise Edition only).</li>
 </ul>
