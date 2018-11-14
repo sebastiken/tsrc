@@ -155,10 +155,10 @@
             <div class="section">
               
                 <h1 id="development">Development<a class="headerlink" href="#development" title="Permanent link">&para;</a></h1>
-<p>All the development happens on <a href="https://github.com/SuperTanker/tsrc">GitHub</a>.</p>
-<p>Outcome of discussions among maintainers and users of the software are tracked in the <a href="https://github.com/SuperTanker/tsrc/wiki">wiki</a>.</p>
+<p>All the development happens on <a href="https://github.com/TankerHQ/tsrc">GitHub</a>.</p>
+<p>Outcome of discussions among maintainers and users of the software are tracked in the <a href="https://github.com/TankerHQ/tsrc/wiki">wiki</a>.</p>
 <h1 id="reporting_bugs_and_suggesting_new_features">Reporting bugs and suggesting new features<a class="headerlink" href="#reporting_bugs_and_suggesting_new_features" title="Permanent link">&para;</a></h1>
-<p>Feel free to use the <a href="https://github.com/SuperTanker/tsrc/issues">GitHub's bug tracker</a> to open issues.</p>
+<p>Feel free to use the <a href="https://github.com/TankerHQ/tsrc/issues">GitHub's bug tracker</a> to open issues.</p>
 <p>If you are reporting a bug, please provide the following information:</p>
 <ul>
 <li><code>tsrc</code> version</li>
@@ -169,7 +169,7 @@
 <p>Doing so will ensure we can investigate your bug right away.</p>
 <h1 id="suggesting_changes">Suggesting changes<a class="headerlink" href="#suggesting_changes" title="Permanent link">&para;</a></h1>
 <p>You are free to open a pull request on GitHub for any feature you'd like.</p>
-<p>Before opening a merge request, please read the <a href="https://supertanker.github.io/tsrc/code-manifesto">code manifesto</a>.</p>
+<p>Before opening a merge request, please read the <a href="https://TankerHQ.github.io/tsrc/code-manifesto">code manifesto</a>.</p>
 <p>Note that for your merge request to be accepted, we'll ask that:</p>
 <ul>
 <li>You follow indications from the code manifesto</li>
@@ -177,36 +177,30 @@
 <li>All existing tests run</li>
 <li>The new feature comes with appropriate tests</li>
 </ul>
-<p>See the <a href="https://github.com/SuperTanker/tsrc/blob/master/.travis.yml">.travis.yml file</a>
+<p>See the <a href="https://github.com/TankerHQ/tsrc/blob/master/.travis.yml">.travis.yml file</a>
 to see what exactly what commands are run and the Python versions we
 support.</p>
 <h1 id="checking_your_changes">Checking your changes<a class="headerlink" href="#checking_your_changes" title="Permanent link">&para;</a></h1>
 <ul>
-<li>Install latest <a href="https://docs.pipenv.org/">pipenv</a> version.</li>
+<li>Install latest <a href="https://github.com/TankerHQ/dmenv">dmenv</a> version.</li>
 <li>Install development and documentation dependencies:</li>
 </ul>
-<pre><code class="console">$ pipenv install --dev
+<pre><code class="console">$ dmenv install
 </code></pre>
 
-<ul>
-<li>Run <code>setup.py develop</code> at least once:</li>
-</ul>
-<pre><code>$ pipenv run python setup.py develop
-</code></pre>
-
-<p>(you should re-run this command every time the <code>setup.py</code> file changes).</p>
 <ul>
 <li>Finally, run:</li>
 </ul>
-<pre><code class="console">$ pipenv run python ci/ci.py
+<pre><code class="console">$ source &quot;$(dmenv show)/bin/activate&quot;
+$ python ci/ci.py
 </code></pre>
 
 <h1 id="adding_documentation">Adding documentation<a class="headerlink" href="#adding_documentation" title="Permanent link">&para;</a></h1>
 <ul>
-<li>Follow the steps from the <a href="#checking_your_changes">Checking your changes</a> section to setup your python environment</li>
+<li>Follow the steps from the above section to setup your python environment</li>
 <li>Launch the development server locally:</li>
 </ul>
-<pre><code class="bash">$ pipenv run mkdocs serve
+<pre><code class="bash">$ dmenv run mkdocs serve
 </code></pre>
 
 <ul>
