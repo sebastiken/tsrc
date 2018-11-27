@@ -177,7 +177,12 @@ syntax.</p>
 <p>Each repository is also a dictionary, containing:</p>
 <ul>
 <li><code>src</code> (required): relative path of the repository in the workspace</li>
-<li><code>url</code> (required): URL to use when cloning the repository (usually using ssh)</li>
+<li>Either:<ul>
+<li><code>url</code> if you just need one remote named <code>origin</code></li>
+<li>A list of remotes with a <code>name</code> and <code>url</code>. In that case, the first remote
+  will be used for cloning the repository.</li>
+</ul>
+</li>
 <li><code>branch</code> (optional): The branch to use when cloning the repository (defaults
   to <code>master</code>)</li>
 <li><code>tag</code> (optional):<ul>
@@ -192,26 +197,32 @@ syntax.</p>
     to the given sha1, else a warning message will be printed.</li>
 </ul>
 </li>
-<li>
-<p><code>copy</code> (optional): A list of dictionaries with <code>src</code> and <code>dest</code> keys, like so:</p>
-<pre><code>repos:
+<li><code>copy</code> (optional): A list of dictionaries with <code>src</code> and <code>dest</code> key.</li>
+</ul>
+<p>Here's a full example:</p>
+<pre><code class="yaml">repos:
   - src: foo
-    url: gitlab:proj1/foo
+    url: git@gitlab.local:proj1/foo
     branch: next
 
   - src: bar
-    url: gitlab:proj1/bar
+    remotes:
+      - name: origin
+        url: git@gitlab.local:proj1/bar
+      - name: upstream
+        url: git@github.com:user/bar
     branch: master
     sha1: ad2b68539c78e749a372414165acdf2a1bb68203
 
   - src: app
-    url: gitlab:proj1/app
+    url: git@gitlab.local:proj1/app
     tag: v0.1
     copy:
       - src: top.cmake
         dest: CMakeLists.txt
       - src: .clang-format
 </code></pre>
+
 <p>In this example:</p>
 <ul>
 <li>First, <code>proj1/foo</code> will be cloned into <code>&lt;workspace&gt;/foo</code> using the <code>next</code> branch.</li>
@@ -224,8 +235,6 @@ syntax.</p>
 </li>
 </ul>
 <p>Note that <code>copy</code> only works with files, not directories.</p>
-</li>
-</ul>
 <h2 id="groups">groups<a class="headerlink" href="#groups" title="Permanent link">&para;</a></h2>
 <p>The <code>groups</code> section lists the groups by name. Each group should have a <code>repos</code> field
 containing a list of repositories (only repositories defined in the <code>repos</code> section are allowed).</p>
