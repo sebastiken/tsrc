@@ -67,6 +67,8 @@
     
         <ul>
         
+            <li><a class="toctree-l4" href="#creating_a_manifest">Creating a manifest</a></li>
+        
             <li><a class="toctree-l4" href="#cloning_a_set_of_repositories">Cloning a set of repositories</a></li>
         
             <li><a class="toctree-l4" href="#making_sure_all_the_repositories_are_up_to_date">Making sure all the repositories are up to date</a></li>
@@ -155,9 +157,9 @@
             <div class="section">
               
                 <h1 id="basic_tsrc_usage">Basic tsrc usage<a class="headerlink" href="#basic_tsrc_usage" title="Permanent link">&para;</a></h1>
-<h2 id="cloning_a_set_of_repositories">Cloning a set of repositories<a class="headerlink" href="#cloning_a_set_of_repositories" title="Permanent link">&para;</a></h2>
-<p><code>tsrc</code> is driven by a manifest file that contains the names and paths of repositories to clone.</p>
-<p>It uses the YAML syntax and looks like:</p>
+<h2 id="creating_a_manifest">Creating a manifest<a class="headerlink" href="#creating_a_manifest" title="Permanent link">&para;</a></h2>
+<p><code>tsrc</code> is driven by a manifest file that contains the names and paths of repositories to use.</p>
+<p>It is a YAML file that looks like this:</p>
 <pre><code class="yaml">repos:
   - src: foo
     url: git@gitlab.local:acme/foo
@@ -170,23 +172,47 @@
 <p class="admonition-title">Note</p>
 <p>The full manifest file format is described in the <a href="../../ref/formats/">reference</a>.</p>
 </div>
-<p>The manifest must be put in a git repository too. You can then use the following commands to create a new workspace:</p>
-<pre><code class="console">$ mkdir ~/work
+<p>You can put the manifest in two different places:</p>
+<ul>
+<li>
+<p>The recommended way is to put the manifest inside its own git repository, so that changes in the
+  manifest can be tracked like any other code change. The file <em>must</em> be named <code>manifest.yml</code></p>
+</li>
+<li>
+<p>Alternatively, you can store the manifest in any file on your file system.</p>
+</li>
+</ul>
+<h2 id="cloning_a_set_of_repositories">Cloning a set of repositories<a class="headerlink" href="#cloning_a_set_of_repositories" title="Permanent link">&para;</a></h2>
+<p>Once the manifest is ready, you can run the following commands to create a new workspace:</p>
+<pre><code class="bash">$ mkdir ~/work
 $ cd work
+
+# When the manifest is inside a git repository:
 $ tsrc init git@gitlab.local:acme/manifest.git
+
+# When the manifest is on the file system:
+$ tsrc init --file /path/to/manifest.yml
 </code></pre>
 
 <p>In this example:</p>
 <ul>
-<li>A clone of the manifest repository will be created in a hidden <code>.tsrc/manifest</code> folder.</li>
-<li><code>foo</code> will be cloned in <code>&lt;work&gt;/foo</code> using <code>git@gitlab.local/acme/foo.git</code> origin url.</li>
+<li>If using a git repository, a clone of the manifest repository will be created in a hidden <code>.tsrc/manifest</code> folder.</li>
+<li>Otherwise, <code>tsrc</code> will write the path of the manifest inside a persistent configuration file.</li>
+<li>Then <code>foo</code> will be cloned in <code>&lt;work&gt;/foo</code> using <code>git@gitlab.local/acme/foo.git</code> as the <code>origin</code> remote URL.</li>
 <li>Similarly, <code>bar</code> will be cloned in <code>&lt;work&gt;/bar</code> using <code>git@gitlab.local:acme/bar.git</code>.</li>
 </ul>
 <h2 id="making_sure_all_the_repositories_are_up_to_date">Making sure all the repositories are up to date<a class="headerlink" href="#making_sure_all_the_repositories_are_up_to_date" title="Permanent link">&para;</a></h2>
 <p>You can update all the repositories by using <code>tsrc sync</code>.</p>
 <ul>
-<li>The manifest itself will be updated first.</li>
-<li>If a new repository has been added to the manifest, it will be cloned.</li>
+<li>If <code>tsrc init</code> was called with a git URL, the manifest clone will be updated first.</li>
+<li>
+<p>Otherwise, <code>tsrc sync</code> will read its persistent configuration file and read the manifest
+  from the recorded path. <strong>This means that if the manifest file path changes,
+  you'll have to re-run <code>tsrc init</code> for <code>tsrc sync</code> to work</strong>.</p>
+</li>
+<li>
+<p>If a new repository has been added to the manifest, it will be cloned.</p>
+</li>
 <li>Lastly, the other repositories will be updated.</li>
 </ul>
 <p>Note that <code>tsrc sync</code> only updates the repositories if the changes are trivial:</p>

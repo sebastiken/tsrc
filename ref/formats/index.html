@@ -267,6 +267,7 @@ $ tsrc init &lt;manifest_url&gt; --group foo
 # Clones a, b, bar and baz
 </code></pre>
 
+<p>Note that <code>tsrc init</code> records the names of the groups it was invoked with, so that <code>tsrc sync</code> re-uses them later on. This means that if you want to change the groups used, you must re-run <code>tsrc init</code> with the new group list.</p>
 <h2 id="tsrcyml_format">tsrc.yml format<a class="headerlink" href="#tsrcyml_format" title="Permanent link">&para;</a></h2>
 <p><code>tsrc.yml</code> must be written in <code>XDG_CONFIG_HOME</code> (or <code>~/.config/</code>).</p>
 <p>We use GitLab authentication with token, like so:</p>
