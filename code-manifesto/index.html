@@ -124,6 +124,9 @@
     <li class="toctree-l2"><a href="#output_messages_to_the_user">Output messages to the user</a></li>
     
 
+    <li class="toctree-l2"><a href="#tests">Tests</a></li>
+    
+
     </ul>
 	    </li>
           
@@ -495,6 +498,38 @@ with open(foo_path, &quot;w&quot;) as fileobj:
 <h1 id="output_messages_to_the_user">Output messages to the user<a class="headerlink" href="#output_messages_to_the_user" title="Permanent link">&para;</a></h1>
 <p>Do not use <code>print</code>, use <a href="https://TankerHQ.github.io/python-cli-ui#api">python-cli-ui functions</a> instead. This makes it easier to distinguish between real messages and the throw-away <code>print</code> statements you add for debugging.</p>
 <p>Also, using "high-level" methods such as <code>ui.info_1()</code> or <code>ui.warning()</code> will make it easier to have a consistent user interface.</p>
+<h1 id="tests">Tests<a class="headerlink" href="#tests" title="Permanent link">&para;</a></h1>
+<p>When writing assertions, use the form <code>assert &lt;actual&gt; == &lt;expected&gt;</code>:</p>
+<pre><code class="python"># Yes
+def test_foo():
+    assert foo(42) == True
+
+def test_big_stuff():
+    actual_result = ...
+    expected_result = ...
+
+    assert actual_result == expected_result
+
+
+# No
+def test_foo():
+    assert True == foo(42)
+
+
+def test_big_stuff():
+    actual_result = ...
+    expected_result = ...
+
+    assert expected_result == actual_result
+</code></pre>
+
+<p>Rationale:</p>
+<ul>
+<li>The <code>assert(expected, actual)</code> convention comes from JUnit but we are not writing Java code,
+  and besides, the <code>assert(actual, expected)</code> convention also exists in other tools.</li>
+<li><code>pytest</code> does not really care, but we prefer being consistent in all tests.</li>
+<li>It's a bit closer to what you would say in English: <em>"Assert that the result of foo() is 42"</em>.</li>
+</ul>
               
             </div>
           </div>
