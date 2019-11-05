@@ -190,6 +190,19 @@ def main_impl(args: ArgsList = None) -> None:
     sync_parser = add_workspace_subparser(subparsers, "sync")
     sync_parser.add_argument("--force", action="store_true")
 
+    snapshot_parser = add_workspace_subparser(subparsers, "snapshot")
+    snapshot_parser.add_argument("-b", "--branches", action="store_true", default=True)
+    snapshot_parser.add_argument("-c", "--sha1", action="store_true", default=False)
+    snapshot_parser.add_argument("-f", "--force", action="store_true", default=False)
+    snapshot_parser.add_argument(
+        "-m",
+        "--manifest-file",
+        help="Manifest file where to write the snapshot",
+        type=Path,
+        dest="file_path",
+        default=Path('manifest.yml'),
+    )
+
     args_ns = parser.parse_args(args=args)  # type: argparse.Namespace
     setup_ui(args_ns)
 

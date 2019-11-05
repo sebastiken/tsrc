@@ -40,6 +40,19 @@ class LocalManifest:
         assert self.manifest, "manifest is empty. Did you call load()?"
         return self.manifest.get_repos(groups=self.active_groups)
 
+    def create_snapshot(self, yml_path: Path, force: bool, sha1: bool) -> None:
+        config = self.load_config()
+        if not yml_path:
+            if not config.file_path:
+                yml_path = self.clone_path / "manifest.yml"
+            else:
+                yml_path = config.file_path
+
+        if yml_path.exists() and not force:
+            message = "Manifest already found in {}. Use -f to force creation."
+            raise tsrc.Error(message.format(yml_path))
+        self.manifest = tsrc.manifest.create_snapshot(yml_path, sha1)
+
     def load(self) -> None:
         config = self.load_config()
         if not config.file_path:

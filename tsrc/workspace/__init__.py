@@ -29,6 +29,10 @@ class Workspace:
     def load_manifest(self) -> None:
         self.local_manifest.load()
 
+    def create_snapshot(
+            self, file_path: Path, force: bool, sha1: bool) -> None:
+        self.local_manifest.create_snapshot(file_path, force, sha1)
+
     def get_gitlab_url(self) -> Optional[str]:
         return self.local_manifest.get_gitlab_url()
 

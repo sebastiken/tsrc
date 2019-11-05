@@ -6,6 +6,7 @@ from typing import cast, Any, Dict, List, NewType, Optional, Tuple  # noqa
 
 from path import Path
 import schema
+import cli_ui as ui
 
 import tsrc
 
@@ -142,6 +143,59 @@ def validate_repo(data: Any) -> None:
         raise schema.SchemaError(
             "Repo config should contain either a url or a non-empty list of remotes"
         )
+
+
+def create_snapshot(manifest_path: Path, sha1: bool = False) -> Manifest:
+    # TODO: traverse current directory, but it would be a parameter
+    from_dir = Path('.')
+
+    repos = []
+    for git_dir in from_dir.walk('.git'):
+        name = str(git_dir.relpath().parent)
+        repo = {'src': name}
+
+        # Get currentbranch
+        cmd = ["rev-parse", "--abbrev-ref", "HEAD"]
+        _, out = tsrc.git.run_captured(git_dir, *cmd)
+        repo['branch'] = out
+
+        # Get current commit
+        if sha1:
+            try:
+                cmd = ["rev-parse", "--short", "--verify", "HEAD"]
+                _, out = tsrc.git.run_captured(git_dir, *cmd)
+                repo['sha1'] = out
+            except tsrc.git.CommandError as e:
+                message = "Repo {} has no commits. Discarded."
+                ui.warning(message.format(name))
+                continue
+
+        # Get all remotes
+        cmd = ["remote"]
+        _, out = tsrc.git.run_captured(git_dir, *cmd)
+        remotes = filter(lambda r: r, out.split('\n'))
+
+        remotes_dict = {}
+        for remote in remotes:
+            cmd = ["remote", "get-url", remote]
+            _, url = tsrc.git.run_captured(git_dir, *cmd)
+            remotes_dict.setdefault(remote, url)
+
+        # Get url of remotes
+        if not remotes_dict:
+            message = "Repo {} has no remotes. Discarded."
+            ui.warning(message.format(name))
+            continue
+        elif len(remotes_dict) == 1:
+            repo['url'] = list(remotes_dict.values())[0]
+        else:
+            repo['remotes'] = [{
+                'name': k, 'url': remotes_dict[k]} for k in remotes_dict.keys()]
+
+        repos.append(repo)
+
+    tsrc.config.dump_config({'repos': repos}, manifest_path)
+    return None
 
 
 def load(manifest_path: Path) -> Manifest:
