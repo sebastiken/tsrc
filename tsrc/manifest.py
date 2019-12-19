@@ -145,7 +145,7 @@ def validate_repo(data: Any) -> None:
         )
 
 
-def create_snapshot(manifest_path: Path, sha1: bool = False) -> Manifest:
+def create_snapshot(manifest_path: Path, sha1: bool = False) -> None:
     # TODO: traverse current directory, but it would be a parameter
     from_dir = Path('.')
 

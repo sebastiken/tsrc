@@ -203,6 +203,15 @@ def main_impl(args: ArgsList = None) -> None:
         default=Path('manifest.yml'),
     )
 
+    reset_parser = add_workspace_subparser(subparsers, "reset")
+    reset_parser.add_argument(
+        "-s",
+        "--snapshot",
+        help="Snapshot file to apply",
+        type=Path,
+        dest="file_path",
+    )
+
     args_ns = parser.parse_args(args=args)  # type: argparse.Namespace
     setup_ui(args_ns)
 

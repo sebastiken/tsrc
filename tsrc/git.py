@@ -39,6 +39,11 @@ class WorktreeNotFound(Error):
         super().__init__("'{}' is not inside a git repository".format(working_path))
 
 
+class NoTrackingRef(Error):
+    def __init__(self, working_path: Path) -> None:
+        super().__init__("'{}' has not tracking ref".format(working_path))
+
+
 def assert_working_path(path: Path) -> None:
     if not path.exists():
         raise NoSuchWorkingPath(path)
@@ -206,6 +211,25 @@ def get_status(working_path: Path) -> Status:
     status = Status(working_path)
     status.update()
     return status
+
+
+def reset_repo(repo: Path, branch: str, sha1: str) -> str:
+    ui.info_2("Fetching all for", repo)
+    run(repo, "fetch", "--all", "--prune")
+
+    # Get actual branch
+    current_branch = get_current_branch(repo)
+
+    if branch != current_branch:
+        run(repo, "checkout", branch)
+
+    tracking_ref = get_tracking_ref(repo)
+    if not tracking_ref:
+        raise NoTrackingRef(repo)
+    run(repo, "merge", "--ff-only", tracking_ref)
+
+    reset(repo, sha1)
+    return "Reseted to {}".format(sha1)
 
 
 def get_tracking_ref(working_path: Path) -> Optional[str]:

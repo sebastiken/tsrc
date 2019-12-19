@@ -33,6 +33,10 @@ class Workspace:
             self, file_path: Path, force: bool, sha1: bool) -> None:
         self.local_manifest.create_snapshot(file_path, force, sha1)
 
+    def reset_snapshot(
+            self, file_path: Path, force: bool) -> None:
+        self.local_manifest.reset_snapshot(file_path, force)
+
     def get_gitlab_url(self) -> Optional[str]:
         return self.local_manifest.get_gitlab_url()
 
