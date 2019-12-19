@@ -225,11 +225,36 @@ def reset_repo(repo: Path, branch: str, sha1: str) -> str:
 
     tracking_ref = get_tracking_ref(repo)
     if not tracking_ref:
-        raise NoTrackingRef(repo)
+        # Try to get tracking ref using origin
+        # and branch name
+        ui.info_2(ui.red, "No tracking ref for", ui.reset, ui.blue, repo.name)
+        ui.info_2(ui.brown, "Trying to guess it from origin and local branch name for", branch)
+
+        tracking_ref = guess_tracking_ref(repo, sha1)
+
+        if not tracking_ref:
+            raise NoTrackingRef(repo)
+
+        ui.info_2(ui.green, "Guessed remote tracking branch", ui.blue,  branch)
+
     run(repo, "merge", "--ff-only", tracking_ref)
 
     reset(repo, sha1)
     return "Reseted to {}".format(sha1)
+
+
+def guess_tracking_ref(working_path: Path, sha1: str) -> Optional[str]:
+    rc, out = run_captured(
+        working_path,
+        "branch", "-r",
+        "--contains", sha1,
+        check=False
+    )
+
+    if rc == 0:
+        return out.strip()
+    else:
+        return None
 
 
 def get_tracking_ref(working_path: Path) -> Optional[str]:
