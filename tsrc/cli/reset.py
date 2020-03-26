@@ -44,6 +44,7 @@ class ResetCollector(tsrc.Task[tsrc.Repo]):
         ui.info_count(index, total, repo.src, end="\r")
         full_path = self.workspace_path / repo.src
 
+        # Clone repo
         if not full_path.exists():
             self.reseted_repos[repo.src] = tsrc.errors.MissingRepo(repo.src)
             return
@@ -79,6 +80,7 @@ def main(args: argparse.Namespace) -> None:
     workspace.load_manifest()
 
     snapshot_manifest = tsrc.manifest.load(args.file_path)
+    snapshot_manifest.clone_missing(workspace.root_path, workspace.shallow)
     snapshot_repos = snapshot_manifest.get_repos()
     reset_collector = ResetCollector(workspace.root_path, args.file_path)
 

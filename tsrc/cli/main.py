@@ -194,6 +194,7 @@ def main_impl(args: ArgsList = None) -> None:
     snapshot_parser.add_argument("-b", "--branches", action="store_true", default=True)
     snapshot_parser.add_argument("-c", "--sha1", action="store_true", default=False)
     snapshot_parser.add_argument("-f", "--force", action="store_true", default=False)
+    snapshot_parser.add_argument("-g", "--define-groups", action="store_true", default=False)
     snapshot_parser.add_argument(
         "-m",
         "--manifest-file",
