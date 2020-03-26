@@ -19,28 +19,40 @@ StatusOrError = Union[tsrc.git.Status, Exception]
 CollectedStatuses = Dict[str, StatusOrError]
 
 
-def describe_status(status: StatusOrError) -> List[ui.Token]:
+def describe_status(status: StatusOrError, show_sha1: bool) -> List[ui.Token]:
     """ Returns a list of tokens suitable for ui.info() """
     if isinstance(status, tsrc.errors.MissingRepo):
         return [ui.red, "error: missing repo"]
     if isinstance(status, Exception):
         return [ui.red, "error: ", status]
-    return describe_git_status(status)
+    return describe_git_status(status, show_sha1)
 
 
-def describe_git_status(git_status: tsrc.git.Status) -> List[ui.Token]:
+def describe_git_status(
+    git_status: tsrc.git.Status, show_sha1: bool
+) -> List[ui.Token]:
     res = []  # type: List[ui.Token]
-    res += describe_branch(git_status)
+    res += describe_branch(git_status, show_sha1)
     res += describe_position(git_status)
     res += describe_dirty(git_status)
+    res += describe_stash(git_status)
     return res
 
 
-def describe_branch(git_status: tsrc.git.Status) -> List[ui.Token]:
+def describe_stash(git_status: tsrc.git.Status) -> List[ui.Token]:
+    res = list()  # type: List[ui.Token]
+    if git_status.stashed_entries:
+        res += [ui.yellow, git_status.stashed_entries, "stashed entries"]
+    return res
+
+
+def describe_branch(
+    git_status: tsrc.git.Status, show_sha1: bool
+) -> List[ui.Token]:
     res = list()  # type: List[ui.Token]
     if git_status.branch:
         res += [ui.green, git_status.branch]
-    elif git_status.sha1:
+    if show_sha1 and git_status.sha1:
         res += [ui.red, git_status.sha1]
     if git_status.tag:
         res += [ui.reset, ui.brown, "on", git_status.tag]
@@ -82,10 +94,11 @@ def erase_last_line() -> None:
 
 
 class StatusCollector(tsrc.Task[tsrc.Repo]):
-    def __init__(self, workspace_path: Path) -> None:
+    def __init__(self, workspace_path: Path, args: argparse.Namespace) -> None:
         self.workspace_path = workspace_path
         self.statuses = collections.OrderedDict()  # type: CollectedStatuses
         self.num_repos = 0
+        self.show_sha1 = args.show_sha1
 
     def display_item(self, repo: tsrc.Repo) -> str:
         return repo.src
@@ -117,12 +130,12 @@ class StatusCollector(tsrc.Task[tsrc.Repo]):
         max_src = max(len(x) for x in self.statuses.keys())
         for src, status in self.statuses.items():
             message = [ui.green, "*", ui.reset, src.ljust(max_src)]
-            message += describe_status(status)
+            message += describe_status(status, self.show_sha1)
             ui.info(*message)
 
 
 def main(args: argparse.Namespace) -> None:
     workspace = tsrc.cli.get_workspace(args)
-    status_collector = StatusCollector(workspace.root_path)
+    status_collector = StatusCollector(workspace.root_path, args)
     workspace.load_manifest()
     tsrc.run_sequence(workspace.get_repos(), status_collector)

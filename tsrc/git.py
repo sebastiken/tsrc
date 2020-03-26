@@ -57,6 +57,7 @@ class Status:
         self.tag = None  # type: Optional[str]
         self.branch = None  # type: Optional[str]
         self.sha1 = None  # type: Optional[str]
+        self.stashed_entries = None  # type: Optional[str]
 
     def update(self) -> None:
         self.update_sha1()
@@ -110,6 +111,8 @@ class Status:
                 self.added += 1
                 self.dirty = True
 
+        _, out = run_captured(self.working_path, "stash", "list")
+        self.stashed_entries = len(out.splitlines())
 
 def run(working_path: Path, *cmd: str, check: bool = True) -> None:
     """ Run git `cmd` in given `working_path`
