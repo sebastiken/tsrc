@@ -30,8 +30,10 @@ class Workspace:
         self.local_manifest.load()
 
     def create_snapshot(
-            self, file_path: Path, force: bool, sha1: bool) -> None:
-        self.local_manifest.create_snapshot(file_path, force, sha1)
+            self, file_path: Path, force: bool,
+            sha1: bool, define_groups: bool) -> None:
+        self.local_manifest.create_snapshot(
+            file_path, force, sha1, define_groups)
 
     def reset_snapshot(
             self, file_path: Path, force: bool) -> None:

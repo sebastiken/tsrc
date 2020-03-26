@@ -9,6 +9,7 @@ import schema
 import cli_ui as ui
 
 import tsrc
+from tsrc.workspace.cloner import Cloner
 
 ManifestConfig = NewType("ManifestConfig", Dict[str, Any])
 RepoConfig = NewType("RepoConfig", Dict[str, Any])
@@ -117,6 +118,15 @@ class Manifest:
                 return repo
         raise RepoNotFound(src)
 
+    def clone_missing(self, root_path: Path, shallow: bool) -> None:
+        to_clone = list()
+        for repo in self.get_repos():
+            repo_path = root_path / repo.src
+            if not repo_path.exists():
+                to_clone.append(repo)
+        cloner = Cloner(root_path, shallow=shallow)
+        tsrc.executor.run_sequence(to_clone, cloner)
+
 
 def validate_repo(data: Any) -> None:
     copy_schema = {"src": str, schema.Optional("dest"): str}
@@ -145,14 +155,26 @@ def validate_repo(data: Any) -> None:
         )
 
 
-def create_snapshot(manifest_path: Path, sha1: bool = False) -> None:
+def create_snapshot(
+    manifest_path: Path,
+    sha1: bool = False,
+    define_groups: bool = False,
+) -> None:
     # TODO: traverse current directory, but it would be a parameter
     from_dir = Path('.')
 
     repos = []
+    groups = {}
     for git_dir in from_dir.walk('.git'):
         name = str(git_dir.relpath().parent)
         repo = {'src': name}
+
+        repo_dir = name.split('/')
+        group = len(repo_dir) > 1 and repo_dir[0] or False
+
+        if group:
+            groups.setdefault(group, {'repos': []})
+            groups[group]['repos'].append(name)
 
         # Get currentbranch
         cmd = ["rev-parse", "--abbrev-ref", "HEAD"]
@@ -194,7 +216,15 @@ def create_snapshot(manifest_path: Path, sha1: bool = False) -> None:
 
         repos.append(repo)
 
-    tsrc.config.dump_config({'repos': repos}, manifest_path)
+    config = {
+        'repos': repos,
+    }
+
+    if define_groups:
+        config['groups'] = groups
+
+    tsrc.config.dump_config(config, manifest_path)
+
     return None
 
 

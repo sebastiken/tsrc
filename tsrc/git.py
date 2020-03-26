@@ -230,15 +230,20 @@ def reset_repo(repo: Path, branch: str, sha1: str) -> str:
         ui.info_2(ui.red, "No tracking ref for", ui.reset, ui.blue, repo.name)
         ui.info_2(ui.brown, "Trying to guess it from origin and local branch name for", branch)
 
-        tracking_ref = guess_tracking_ref(repo, sha1)
+        candidates = guess_tracking_ref(repo, sha1)
+        # TODO: What to do when multiple remotes
+        for candidate in candidates:
+            remote, remote_branch = candidate.split('/')
+            if branch == remote_branch:
+                tracking_ref = candidate
+                break
 
         if not tracking_ref:
             raise NoTrackingRef(repo)
 
         ui.info_2(ui.green, "Guessed remote tracking branch", ui.blue,  branch)
 
-    run(repo, "merge", "--ff-only", tracking_ref)
-
+    run_captured(repo, "merge", "--ff-only", tracking_ref)
     reset(repo, sha1)
     return "Reseted to {}".format(sha1)
 
@@ -252,7 +257,8 @@ def guess_tracking_ref(working_path: Path, sha1: str) -> Optional[str]:
     )
 
     if rc == 0:
-        return out.strip()
+        candidates = [c.strip() for c in out.splitlines()]
+        return candidates
     else:
         return None
 

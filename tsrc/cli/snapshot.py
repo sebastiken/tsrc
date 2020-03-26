@@ -12,4 +12,5 @@ def main(args: argparse.Namespace) -> None:
     workspace.create_snapshot(
         force=args.force,
         file_path=args.file_path,
-        sha1=args.sha1)
+        sha1=args.sha1,
+        define_groups=args.define_groups)
