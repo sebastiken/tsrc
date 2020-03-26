@@ -185,7 +185,10 @@ def main_impl(args: ArgsList = None) -> None:
         "--ready", action="store_true", help="Mark merge request as ready"
     )
 
-    add_workspace_subparser(subparsers, "status")
+    status_parser = add_workspace_subparser(subparsers, "status")
+    status_parser.add_argument(
+        "-c", "--show-sha1", action="store_true", default=False
+    )
 
     sync_parser = add_workspace_subparser(subparsers, "sync")
     sync_parser.add_argument("--force", action="store_true")
