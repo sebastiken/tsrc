@@ -36,8 +36,9 @@ class RemoteSetter(tsrc.executor.Task[tsrc.Repo]):
 
     def get_remote(self, repo: tsrc.Repo, name: str) -> Optional[tsrc.Remote]:
         full_path = self.workspace_path / repo.src
+        remote_name = 'remote.%s.url' % (name)
         rc, url = tsrc.git.run_captured(
-            full_path, "remote", "get-url", name, check=False
+            full_path, "config", "--get", remote_name, check=False
         )
         if rc != 0:
             return None
